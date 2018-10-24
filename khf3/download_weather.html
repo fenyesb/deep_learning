@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<script
+src="https://code.jquery.com/jquery-3.3.1.min.js"
+integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+crossorigin="anonymous"></script>
+</head>
+<body>
+<pre id="result"></pre>
+<script>
+var s = "";
+var params = {ev: "2017", ho: "01", button: "Mehet"};
+function load(y, m)
+{
+	params.ev = y+""
+	params.ho = m<10?"0"+(m+""):m+""
+	console.log(params);
+	$.post("http://idojarasbudapest.hu/archivalt-idojaras", params, function(data, status){
+		s += data.split("data: \[")[1].split("]")[0].trim();
+		m++;
+		if(m==13)
+		{
+			m=1;
+			y++;
+		}
+		if(y==2018&&m==10)
+		{
+			eval("t = [" + s.substr(0, s.length-1) + "];");
+			var r = "";
+			for(var i = 0; i < t.length; i++)
+			{
+			  date = new Date(t[i].date);
+			  day = Math.round((date-new Date(date.getFullYear(), 0, 1))/ 1000 / 60 / 60 / 24);
+			  if(y==2016 || y==2012)
+			  {
+				day /= 366.0
+			  }else
+			  {
+				day /= 365.0
+			  }
+			  r += Math.round(10000*day)/10000 + "," + Math.round((t[i].gy1 + t[i].gy2)/2.0*100.0)/100.0 + "\n";
+			}
+			document.getElementById("result").innerText = "DayOfYear,TempC\n"+r;
+			return;
+		}
+		load(y,m);
+	});
+}
+load(2011, 9);
+</script>
+</body>
+</html>
